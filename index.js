@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
-const port=process.env.PORT || 3000
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const port=process.env.PORT || 3010
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 const app=express();
 //midlewares
@@ -24,7 +24,13 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
     const CraftCollection=client.db('Crafts').collection('Items')
-
+    //get single craft
+    app.get('/items/:id',async(req,res)=>{
+      const id=req.params.id;
+      const query={_id:new ObjectId(id)}
+      const item=await CraftCollection.findOne(query)
+      res.send(item)
+    })
     //get craft
     app.get('/items',async(req,res)=>{
       const craft=CraftCollection.find();
@@ -32,7 +38,7 @@ async function run() {
       res.send(result)
     })
 
-    //crete craft
+    //create craft
     app.post('/items',async(req,res)=>{
       const item=req.body;
       const doc = 
@@ -53,8 +59,16 @@ async function run() {
         }
     
       const result=await CraftCollection.insertOne(doc)
-      console.log(result)
       res.send(result)
+    })
+
+    //delete craft
+    app.delete('/items/:id',async(req,res)=>{
+      const id=req.params.id;
+      const query={_id:new ObjectId(id)}
+      const result=await CraftCollection.deleteOne(query);
+      console.log(result)
+      res.send(result);
     })
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
@@ -71,6 +85,6 @@ run().catch(console.dir);
 
 
 //listen
-app.listen(port,(req,res)=>{
+app.listen(port,()=>{
     console.log(`Server is running on port ${port}`)
 })
