@@ -22,8 +22,12 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
+
     const CraftCollection = client.db("Crafts").collection("Items");
+    app.get('/',(req,res)=>{
+      res.send('hello world!')
+    })
     //get single craft
     app.get("/items/:id", async (req, res) => {
       const id = req.params.id;
@@ -105,6 +109,4 @@ run().catch(console.dir);
 
 
 //listen
-app.listen(port,()=>{
-    console.log(`Server is running on port ${port}`)
-})
+app.listen(port);
